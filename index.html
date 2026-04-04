@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Hữu Chiến Acoustic</title>
+
+<style>
+body {
+    background: #000;
+    color: #00eaff;
+    font-family: Arial;
+    text-align: center;
+    padding: 40px;
+}
+
+.container {
+    border: 2px solid #00eaff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 30px #00eaff;
+    max-width: 500px;
+    margin: auto;
+}
+
+button {
+    background: #00eaff;
+    color: black;
+    border: none;
+    padding: 12px 20px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>🎧 Hữu Chiến Acoustic</h2>
+
+    <input type="file" id="file"><br>
+
+    <button onclick="analyze()">ANALYZE ACOUSTIC</button>
+
+    <div id="result" style="margin-top:20px;"></div>
+</div>
+
+<script>
+async function analyze() {
+
+    let fileInput = document.getElementById("file");
+    let result = document.getElementById("result");
+
+    if (!fileInput.files.length) {
+        alert("⚠️ Chọn file trước!");
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    result.innerHTML = "⏳ Đang phân tích...";
+
+    try {
+        let response = await fetch("https://huuchien-acoustic-api-production.up.railway.app/analyze", {
+            method: "POST",
+            body: formData
+        });
+
+        let data = await response.json();
+
+        result.innerHTML = `
+            <h3>📊 Kết quả</h3>
+            <p><b>RT60:</b> ${data.rt60}</p>
+            <p><b>SPL:</b> ${data.spl} dB</p>
+
+            <br>
+            <a href="https://zalo.me/0933525247" target="_blank">
+                <button>📞 Liên hệ Zalo</button>
+            </a>
+        `;
+
+    } catch (error) {
+        console.error(error);
+        result.innerHTML = "❌ Lỗi kết nối API";
+    }
+}
+</script>
+
+</body>
+</html>

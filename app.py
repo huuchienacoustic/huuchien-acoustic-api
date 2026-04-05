@@ -1,18 +1,15 @@
-from flask import Flask, request, jsonify
+from flask import Flask
 import os
 
 app = Flask(__name__)
 
-# ==============================
-# ROUTE TEST
-# ==============================
 @app.route("/")
 def home():
-    return jsonify({
-        "status": "OK",
-        "message": "HuuChien Acoustic API running"
-    })
+    return {"status": "OK", "message": "HuuChien Acoustic API running"}
 
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
 
 # ==============================
 # ROUTE TEST API

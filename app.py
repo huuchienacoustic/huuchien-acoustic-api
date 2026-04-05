@@ -1,33 +1,50 @@
-from fastapi import FastAPI, UploadFile, File
-from fastapi.middleware.cors import CORSMiddleware
-import numpy as np
-import librosa
+from flask import Flask, request, jsonify
+import os
 
-app = FastAPI()
+app = Flask(__name__)
 
-# 🔥 CORS (bắt buộc)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# ==============================
+# ROUTE TEST
+# ==============================
+@app.route("/")
+def home():
+    return jsonify({
+        "status": "OK",
+        "message": "HuuChien Acoustic API running"
+    })
 
-@app.get("/")
-def root():
-    return {"status": "HuuChien Acoustic API running"}
 
-@app.post("/analyze")
-async def analyze(file: UploadFile = File(...)):
-    audio_bytes = await file.read()
+# ==============================
+# ROUTE TEST API
+# ==============================
+@app.route("/api/test", methods=["GET"])
+def test_api():
+    return jsonify({
+        "result": "API working",
+        "version": "1.0"
+    })
 
-    with open("temp.wav", "wb") as f:
-        f.write(audio_bytes)
 
-    y, sr = librosa.load("temp.wav", sr=None)
+# ==============================
+# ROUTE UPLOAD FILE (chuẩn bị cho SaaS)
+# ==============================
+@app.route("/api/upload", methods=["POST"])
+def upload_file():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
 
-    rt60 = round(np.random.uniform(0.3, 1.2), 2)
-    spl = round(np.mean(np.abs(y)) * 100, 2)
+    file = request.files['file']
 
-    return {"rt60": rt60, "spl": spl}
+    # demo xử lý (sau này bạn sẽ phân tích âm học ở đây)
+    return jsonify({
+        "filename": file.filename,
+        "status": "uploaded successfully"
+    })
+
+
+# ==============================
+# START SERVER (QUAN TRỌNG)
+# ==============================
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    app.run(host="0.0.0.0", port=port)
